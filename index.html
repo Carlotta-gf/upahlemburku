@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Web Upah Lembur</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #222;
+    display: flex; flex-direction: column; min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .container {
+    max-width: 480px;
+    width: 100%;
+    margin: 3rem 1rem 5rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    padding: 2rem 2.5rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  h1, h2, h3 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #3b3b3b;
+  }
+  p {
+    color: #555;
+    line-height: 1.5;
+    font-size: 1.05rem;
+  }
+  button {
+    background: linear-gradient(45deg, #7b5cff, #3a26f3);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 2rem;
+    user-select: none;
+    box-shadow: 0 4px 15px rgba(123,92,255,0.6);
+  }
+  button:hover:not(:disabled) {
+    background: linear-gradient(45deg, #5e44eb, #2e1cdd);
+    box-shadow: 0 6px 20px rgba(94,68,235,0.9);
+  }
+  button:disabled {
+    background-color: #c1c1ff;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  input[type="number"], input[type="date"], select {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    margin-top: 0.4rem;
+    box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.07);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+    color: #444;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  input[type="number"]:focus, input[type="date"]:focus, select:focus {
+    outline: none;
+    border-color: #7b5cff;
+    box-shadow: 0 0 8px #a394ff9e;
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 1.4rem;
+    color: #4a4a4a;
+    font-size: 1rem;
+  }
+  .center {
+    text-align: center;
+  }
+  img {
+    max-width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(123, 92, 255, 0.35);
+    margin-bottom: 1.8rem;
+    user-select: none;
+    transition: transform 0.3s ease;
+  }
+  img:hover {
+    transform: scale(1.04);
+  }
+  nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.12);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    user-select: none;
+    z-index: 90;
+  }
+  nav button {
+    background: none;
+    color: #7b5cff;
+    padding: 0.3rem;
+    border-radius: 12px;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  nav button.active {
+    background-color: #7b5cff;
+    color: white;
+    box-shadow: 0 6px 20px rgba(123,92,255,0.85);
+  }
+  nav button:hover:not(.active) {
+    background-color: #e3dcffcc;
+    color: #5a3fcb;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    user-select: text;
+  }
+  th, td {
+    text-align: left;
+    padding: 14px 15px;
+    border-bottom: 1px solid #eae6ff;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #555;
+  }
+  th {
+    background-color: #f3eaff;
+    color: #5b4791;
+  }
+  tbody tr:hover {
+    background-color: #f0e7ffcc;
+  }
+  .form-inline {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 0.8rem;
+  }
+  .form-inline > div {
+    flex: 1 1 120px;
+  }
+  .info-text {
+    margin-top: 1rem;
+    font-size: 0.92rem;
+    color: #7159b9;
+  }
+  .download-btn {
+    margin-top: 1rem;
+    background: linear-gradient(45deg, #08d9d6, #3a86ff);
+    box-shadow: 0 4px 15px rgba(58,134,255,0.7);
+  }
+  .download-btn:hover {
+    background: linear-gradient(45deg, #00c8c2, #006fff);
+    box-shadow: 0 6px 24px rgba(0,111,255,0.9);
+  }
+  .no-data {
+    padding: 1.5rem;
+    font-style: italic;
+    color: #888;
+    user-select: none;
+    font-weight: 500;
+  }
+  /* Icons style */
+  .icon {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+  }
+  /* Scroll container for table */
+  .table-container {
+    max-height: 320px;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: inset 0 0 14px rgb(123 92 255 / 0.15);
+    border: 1px solid #cec0ffb5;
+  }
+  /* Progress bar for steps */
+  .progressbar {
+    position: absolute;
+    top: 1rem;
+    left: 2rem;
+    right: 2rem;
+    height: 6px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.7rem;
+    user-select: none;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 0.08);
+  }
+  .progressbar > div {
+    height: 100%;
+    background: linear-gradient(90deg,#7b5cff, #3a26f3);
+    width: 0%;
+    transition: width 0.4s ease-in-out;
+    border-radius: 4px;
+  }
+  /* Fade animation for step content */
+  #app > div {
+    animation: fadeIn 0.6s ease forwards;
+  }
+  @keyframes fadeIn {
+    0% {opacity: 0; transform: translateY(8px);}
+    100% {opacity: 1; transform: translateY(0);}
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="progressbar" aria-hidden="true"><div></div></div>
+  <!-- Step pages will be dynamically rendered here -->
+</div>
+
+<nav aria-label="Main Navigation" id="navBar" style="display:none;">
+  <button id="btnHome" title="Beranda" aria-label="Beranda" class="active" tabindex="0" >
+    <svg class="icon" viewBox="0 0 576 512" aria-hidden="true" focusable="false"><path d="M280.37 148.26L96 300.11V464a16 16 0 0016 16l112-.29a16 16 0 0016-15.78V368a16 16 0 0116-16h64a16 16 0 0116 16v111.72a16 16 0 0016 15.78l112 .29a16 16 0 0016-16V300L295.67 148.26a12.19 12.19 0 00-15.3 0zM571.6 251.47L488 182.56V44a12 12 0 00-12-12h-56a12 12 0 00-12 12v72.61L318.47 43a48 48 0 00-60.94 0L4.34 251.47a12 12 0 00-1.6 17l25.5 31a12 12 0 0017 1.6L64 271.69V464a48 48 0 0048 48h368a48 48 0 0048-48V271.69l18.25 15.4a12 12 0 0017-1.6l25.5-31a12 12 0 00-1.15-16.02z"/></svg>
+  </button>
+  <button id="btnInfo" title="Informasi" aria-label="Informasi Lemburan" tabindex="0">
+    <svg class="icon" viewBox="0 0 192 512" aria-hidden="true" focusable="false"><path d="M96 0C43 0 0 43 0 96s43 96 96 96c53 0 96-43 96-96S149 0 96 0zm12 156h-24c-6.6 0-12 5.4-12 12v224c0 6.6 5.4 12 12 12h24c6.6 0 12-5.4 12-12V168c0-6.6-5.4-12-12-12z"/></svg>
+  </button>
+</nav>
+
+<script>
+(() => {
+  const appEl = document.getElementById('app');
+  const navBar = document.getElementById('navBar');
+  const btnHome = document.getElementById('btnHome');
+  const btnInfo = document.getElementById('btnInfo');
+  const progressBar = document.querySelector('.progressbar > div');
+
+  // State variables
+  let currentStep = 0;
+  let salary = 0;
+  let overtimePerHour = 0;
+  let holidayOvertimePerHour = 0;
+  // Store overtime entries as array of objects: { date: string (yyyy-mm-dd), hours: number, isHoliday: boolean }
+  // Entire app data saved and loaded from localStorage with key 'upahLemburData'
+  // Format { config: {salary, overtimePerHour, holidayOvertimePerHour}, entries: [ ... ] }
+  let data = { config: {}, entries: [] };
+  let dashboardView = 'home'; // 'home' or 'info'
+
+  const images = {
+    intro: 'https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=600&q=80',
+    salary: 'https://images.unsplash.com/photo-1542224566-c4a11a8d7677?auto=format&fit=crop&w=600&q=80',
+    holiday: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80'
+  };
+
+  // Util: save data to localStorage
+  function saveData() {
+    try {
+      localStorage.setItem('upahLemburData', JSON.stringify(data));
+    } catch (e) {
+      alert('Tidak dapat menyimpan data. Pastikan browser Anda mengizinkan penyimpanan lokal.');
+    }
+  }
+  // Util: load data from localStorage
+  function loadData() {
+    try {
+      const stored = localStorage.getItem('upahLemburData');
+      if (stored) {
+        data = JSON.parse(stored);
+        salary = data.config.salary || 0;
+        overtimePerHour = data.config.overtimePerHour || 0;
+        holidayOvertimePerHour = data.config.holidayOvertimePerHour || 0;
+      }
+    } catch(e) {
+      data = { config: {}, entries: [] };
+    }
+  }
+
+  // Format number as rupiah currency string with dots separator
+  function formatRupiah(num) {
+    return num.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+  }
+  // Format date from yyyy-mm-dd to dd/mm/yyyy
+  function formatDateIndo(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('id-ID');
+  }
+
+  // Update progress bar with current step (0-4)
+  function updateProgressBar() {
+    if (currentStep === 4) {
+      progressBar.style.width = '100%';
+    } else {
+      let percent = ((currentStep) / 4) * 100;
+      progressBar.style.width = percent + '%';
+    }
+  }
+
+  // Render pages
+  function render() {
+    navBar.style.display = currentStep === 4 ? 'flex' : 'none';
+    updateProgressBar();
+    if (currentStep === 0) renderIntro();
+    else if (currentStep === 1) renderInputSalary();
+    else if (currentStep === 2) renderInputOvertime();
+    else if (currentStep === 3) renderInputHolidayOvertime();
+    else if (currentStep === 4) renderDashboard();
+  }
+
+  // Step 0: Intro greeting with image & next
+  function renderIntro() {
+    appEl.innerHTML = `
+      <div class="center">
+        <h1>Selamat Datang di Web Upah Lembur</h1>
+        <img src="${images.intro}" alt="Selamat Datang" loading="lazy" />
+        <p>Web ini membantu menghitung dan mencatat upah lembur Anda dengan mudah dan praktis.</p>
+        <button id="btnNext" aria-label="Mulai menggunakan web upah lembur">Mulai</button>
+      </div>
+    `;
+    document.getElementById('btnNext').addEventListener('click', () => {
+      currentStep = 1;
+      render();
+    });
+  }
+
+  // Step 1: Input salary with image & next
+  function renderInputSalary() {
+    appEl.innerHTML = `
+      <div>
+        <h2>Masukkan Jumlah Gaji Pokok Bulanan Anda</h2>
+        <img src="${images.salary}" alt="Gaji" loading="lazy" />
+        <label for="inputSalary">Gaji Pokok (rupiah)</label>
+        <input type="number" id="inputSalary" min="0" step="1000" placeholder="Contoh: 5.000.000" value="${salary > 0 ? salary : ''}" aria-describedby="descSalary" />
+        <small id="descSalary" style="display:block; margin-top:0.4rem; color:#aaa; font-style: italic;">Input tanpa titik atau koma, contoh: 5000000</small>
+        <button id="btnNext" ${salary <= 0 ? 'disabled' : ''} aria-disabled="${salary <= 0}">Berikutnya</button>
+      </div>
+    `;
+    const inputSalary = document.getElementById('inputSalary');
+    const btnNext = document.getElementById('btnNext');
+    inputSalary.focus();
+
+    inputSalary.addEventListener('input', e => {
+      const val = parseInt(e.target.value.toString().replace(/\./g, ''));
+      if (!isNaN(val) && val > 0) {
+        salary = val;
+        btnNext.disabled = false;
+        btnNext.setAttribute('aria-disabled', 'false');
+      } else {
+        salary = 0;
+        btnNext.disabled = true;
+        btnNext.setAttribute('aria-disabled', 'true');
+      }
+    });
+
+    btnNext.addEventListener('click', () => {
+      data.config.salary = salary;
+      saveData();
+      currentStep = 2;
+      render();
+    });
+  }
+
+  // Step 2: Input overtime per hour & next
+  function renderInputOvertime() {
+    appEl.innerHTML = `
+      <div>
+        <h2>Masukkan Jumlah Upah Lembur Per 1 Jam</h2>
+        <label for="inputOvertime">Upah Lembur Per Jam (rupiah)</label>
+        <input type="number" id="inputOvertime" min="0" step="1000" placeholder="Contoh: 20.000" value="${overtimePerHour > 0 ? overtimePerHour : ''}" aria-describedby="descOvertime"/>
+        <small id="descOvertime" style="display:block; margin-top:0.4rem; color:#aaa; font-style: italic;">Input tanpa titik atau koma, contoh: 20000</small>
+        <button id="btnNext" ${overtimePerHour <= 0 ? 'disabled' : ''} aria-disabled="${overtimePerHour <= 0}">Berikutnya</button>
+      </div>
+    `;
+    const inputOvertime = document.getElementById('inputOvertime');
+    const btnNext = document.getElementById('btnNext');
+    inputOvertime.focus();
+
+    inputOvertime.addEventListener('input', e => {
+      const val = parseInt(e.target.value.toString().replace(/\./g, ''));
+      if (!isNaN(val) && val > 0) {
+        overtimePerHour = val;
+        btnNext.disabled = false;
+        btnNext.setAttribute('aria-disabled', 'false');
+      } else {
+        overtimePerHour = 0;
+        btnNext.disabled = true;
+        btnNext.setAttribute('aria-disabled', 'true');
+      }
+    });
+
+    btnNext.addEventListener('click', () => {
+      data.config.overtimePerHour = overtimePerHour;
+      saveData();
+      currentStep = 3;
+      render();
+    });
+  }
+
+  // Step 3: Input holiday overtime per hour with image & next
+  function renderInputHolidayOvertime() {
+    appEl.innerHTML = `
+      <div>
+        <h2>Masukkan Jumlah Upah Lembur Hari Libur Per 1 Jam</h2>
+        <img src="${images.holiday}" alt="Hari Libur" loading="lazy" />
+        <label for="inputHolidayOvertime">Upah Lembur Hari Libur Per Jam (rupiah)</label>
+        <input type="number" id="inputHolidayOvertime" min="0" step="1000" placeholder="Contoh: 35.000" value="${holidayOvertimePerHour >= 0 ? holidayOvertimePerHour : ''}" aria-describedby="descHolidayOvertime"/>
+        <small id="descHolidayOvertime" style="display:block; margin-top:0.4rem; color:#aaa; font-style: italic;">Input tanpa titik atau koma, contoh: 35000. Bisa 0 jika tidak ada</small>
+        <button id="btnNext" ${holidayOvertimePerHour < 0 ? 'disabled' : ''} aria-disabled="${holidayOvertimePerHour < 0}">Berikutnya</button>
+      </div>
+    `;
+    const inputHolidayOvertime = document.getElementById('inputHolidayOvertime');
+    const btnNext = document.getElementById('btnNext');
+    inputHolidayOvertime.focus();
+
+    inputHolidayOvertime.addEventListener('input', e => {
+      const val = parseInt(e.target.value.toString().replace(/\./g, ''));
+      if (!isNaN(val) && val >= 0) {
+        holidayOvertimePerHour = val;
+        btnNext.disabled = false;
+        btnNext.setAttribute('aria-disabled', 'false');
+      } else {
+        holidayOvertimePerHour = -1;
+        btnNext.disabled = true;
+        btnNext.setAttribute('aria-disabled', 'true');
+      }
+    });
+
+    btnNext.addEventListener('click', () => {
+      data.config.holidayOvertimePerHour = holidayOvertimePerHour;
+      saveData();
+      currentStep = 4;
+      render();
+    });
+  }
+
+  // Step 4: Dashboard with navigation, form, table, info panel
+  function renderDashboard() {
+    appEl.innerHTML = `
+      <div>
+        <h2>Dashboard Upah Lembur Anda</h2>
+        <div id="dashboardContent"></div>
+      </div>
+    `;
+
+    renderDashboardContent();
+    navBar.style.display = 'flex';
+    updateNavActive();
+  }
+
+  function updateNavActive() {
+    if (dashboardView === 'home') {
+      btnHome.classList.add('active');
+      btnInfo.classList.remove('active');
+    } else {
+      btnHome.classList.remove('active');
+      btnInfo.classList.add('active');
+    }
+  }
+
+  // Render inside dashboard: home or info
+  function renderDashboardContent() {
+    const contentEl = document.getElementById('dashboardContent');
+    if (dashboardView === 'home') {
+      contentEl.innerHTML = `
+        <section aria-label="Form Tambah Lembur">
+          <h3>Tambah Lembur</h3>
+          <form id="addOvertimeForm" autocomplete="off">
+            <label for="inputDate">Tanggal</label>
+            <input type="date" id="inputDate" required max="${new Date().toISOString().split('T')[0]}" aria-required="true" aria-describedby="dateHelp"/>
+            <small id="dateHelp" style="color:#777; font-size:0.85rem; margin-top:-0.5rem; margin-bottom:0.8rem;">Tanggal lembur tidak boleh di masa depan</small>
+            
+            <label for="inputHours">Jumlah Jam Lembur</label>
+            <input type="number" id="inputHours" step="0.1" min="0.1" required aria-required="true" placeholder="Contoh: 2" />
+            
+            <label for="selectHoliday">Hari Libur?</label>
+            <select id="selectHoliday" aria-required="true" required>
+              <option value="false" selected>Bukan Hari Libur</option>
+              <option value="true">Hari Libur</option>
+            </select>
+
+            <div class="info-text" aria-live="polite" aria-atomic="true">Nominal upah per jam akan otomatis dihitung berdasarkan data sebelumnya.</div>
+
+            <button type="submit" id="btnAdd" style="margin-top:2rem;" aria-label="Tambah data lembur">Tambah</button>
+          </form>
+        </section>
+        
+        <section aria-label="Tabel Lembur" style="margin-top:3rem;">
+          <h3>Data Lembur</h3>
+          <div class="table-container" tabindex="0" aria-describedby="tableDesc">
+            <table aria-live="polite" aria-relevant="additions removals" aria-label="Tabel data lembur">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Jam Lembur</th>
+                  <th>Hari Libur</th>
+                  <th>Upah Per Jam</th>
+                  <th>Total Upah</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="overtimeTableBody">
+                ${data.entries.length === 0 ? `<tr><td colspan="6" class="no-data">Belum ada data lembur</td></tr>` : ''}
+              </tbody>
+            </table>
+          </div>
+          <div id="tableDesc" style="display:none;">Data lembur ditampilkan pada tabel di atas</div>
+        </section>
+      `;
+      bindAddOvertimeForm();
+      renderOvertimeTable();
+    } else if (dashboardView === 'info') {
+      renderInfoPage();
+    }
+  }
+
+  // Render info page with summary and download excel button + monthly stats without zero months
+  function renderInfoPage() {
+    const contentEl = document.getElementById('dashboardContent');
+    if (data.entries.length === 0) {
+      contentEl.innerHTML = `<p class="no-data" style="padding-top: 1rem;">Belum ada data lembur untuk ditampilkan.</p>`;
+      return;
+    }
+
+    // Sum up totals
+    let totalHours = 0;
+    let totalPay = 0;
+    data.entries.forEach(e => {
+      const rate = e.isHoliday ? holidayOvertimePerHour : overtimePerHour;
+      totalHours += e.hours;
+      totalPay += e.hours * rate;
+    });
+
+    // Compute monthly stats (yyyy-mm) excluding months with zero entries
+    const monthlyMap = {};
+    data.entries.forEach(e => {
+      const monthKey = e.date.slice(0,7); // yyyy-mm
+      if (!monthlyMap[monthKey]) monthlyMap[monthKey] = { entries: 0, hours: 0, pay: 0 };
+      const rate = e.isHoliday ? holidayOvertimePerHour : overtimePerHour;
+      monthlyMap[monthKey].entries++;
+      monthlyMap[monthKey].hours += e.hours;
+      monthlyMap[monthKey].pay += e.hours * rate;
+    });
+
+    // Sort month keys ascending
+    const sortedMonths = Object.keys(monthlyMap).sort();
+
+    // Build monthly stats table HTML
+    let monthlyTableHtml = `
+      <h4 style="margin-top:1.8rem;">Statistik Lembur Per Bulan</h4>
+      <div class="table-container" style="max-height: 200px;">
+        <table aria-label="Statistik lembur per bulan">
+          <thead>
+            <tr>
+              <th>Bulan-Tahun</th>
+              <th>Total Data</th>
+              <th>Total Jam</th>
+              <th>Total Upah</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    sortedMonths.forEach(m => {
+      const stats = monthlyMap[m];
+      // Format month-year to Indonesian locale, e.g. "Juni 2023"
+      const [year, month] = m.split('-');
+      const date = new Date(year, month - 1);
+      const monthYearStr = date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+      if(stats.entries > 0){
+        monthlyTableHtml += `
+          <tr>
+            <td>${monthYearStr}</td>
+            <td>${stats.entries}</td>
+            <td>${stats.hours.toFixed(2)}</td>
+            <td>${formatRupiah(stats.pay)}</td>
+          </tr>
+        `;
+      }
+    });
+    monthlyTableHtml += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    contentEl.innerHTML = `
+      <h3>Informasi Lembur</h3>
+      <p>Total Data Lembur: <strong>${data.entries.length}</strong></p>
+      <p>Total Jam Lembur: <strong>${totalHours.toFixed(2)}</strong> jam</p>
+      <p>Total Upah Lembur: <strong>${formatRupiah(totalPay)}</strong></p>
+      <button id="btnDownloadExcel" class="download-btn" aria-label="Download Data Lembur Excel">Download Data Excel (.xls)</button>
+      ${monthlyTableHtml}
+    `;
+    document.getElementById('btnDownloadExcel').addEventListener('click', downloadExcel);
+  }
+
+  // Render the overtime entries table body
+  function renderOvertimeTable() {
+    const tbody = document.getElementById('overtimeTableBody');
+    if (!tbody) return;
+    if (data.entries.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="no-data">Belum ada data lembur</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = '';
+    data.entries.forEach((entry, index) => {
+      const rate = entry.isHoliday ? holidayOvertimePerHour : overtimePerHour;
+      const total = entry.hours * rate;
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${formatDateIndo(entry.date)}</td>
+        <td>${entry.hours.toFixed(2)}</td>
+        <td>${entry.isHoliday ? 'Ya' : 'Tidak'}</td>
+        <td>${formatRupiah(rate)}</td>
+        <td>${formatRupiah(total)}</td>
+        <td><button class="btnDelete" aria-label="Hapus data lembur tanggal ${formatDateIndo(entry.date)}" title="Hapus"><svg class="icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M135.2 17.7L121 32H24c-13.3 0-24 10.7-24 24v16c0 6.6 5.4 12 12 12H32l35.2 352.1c1.2 15.3 14.3 27.2 29.7 27.2h293.7c15.4 0 28.5-11.9 29.7-27.2L416 84H432c6.6 0 12-5.4 12-12V56c0-13.3-10.7-24-24-24H327l-14.2-14.3C306.3 3.7 294.6 0 282.6 0H172c-12 0-23.7 3.7-36.8 17.7zM312 144c0-8.8-7.2-16-16-16s-16 7.2-16 16v256c0 8.8 7.2 16 16 16s16-7.2 16-16V144zm-96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v256c0 8.8 7.2 16 16 16s16-7.2 16-16V144zm96 272c0 8.8-7.2 16-16 16s-16-7.2-16-16v-16h32v16z"/></svg></button></td>
+      `;
+      row.querySelector('.btnDelete').addEventListener('click', () => {
+        if (confirm(`Hapus data lembur tanggal ${formatDateIndo(entry.date)}?`)) {
+          data.entries.splice(index, 1);
+          saveData();
+          renderOvertimeTable();
+          if (dashboardView === 'info') renderInfoPage();
+        }
+      });
+      tbody.appendChild(row);
+    });
+  }
+
+  // Bind the add overtime form submission
+  function bindAddOvertimeForm() {
+    const form = document.getElementById('addOvertimeForm');
+    const inputDate = document.getElementById('inputDate');
+    const inputHours = document.getElementById('inputHours');
+    const selectHoliday = document.getElementById('selectHoliday');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      // Validate date - no future date allowed
+      const dateVal = inputDate.value;
+      if (!dateVal) {
+        alert('Mohon pilih tanggal lembur.');
+        inputDate.focus();
+        return;
+      }
+      const selectedDate = new Date(dateVal + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      if (selectedDate > today) {
+        alert('Tanggal lembur tidak boleh di masa depan.');
+        inputDate.focus();
+        return;
+      }
+
+      // Validate hours
+      const hoursValRaw = inputHours.value;
+      const hoursVal = parseFloat(hoursValRaw.replace(',', '.'));
+      if (isNaN(hoursVal) || hoursVal <= 0) {
+        alert('Masukkan jumlah jam lembur yang valid.');
+        inputHours.focus();
+        return;
+      }
+
+      // Validate holiday selection
+      const isHoliday = selectHoliday.value === 'true';
+
+      // Add entry
+      data.entries.push({
+        date: dateVal,
+        hours: hoursVal,
+        isHoliday: isHoliday
+      });
+
+      saveData();
+      renderOvertimeTable();
+      if (dashboardView === 'info') renderInfoPage();
+
+      // Reset form but keep date to empty for easier entry
+      form.reset();
+      inputDate.focus();
+    });
+  }
+
+  // Download data in Excel-compatible XLS (HTML table format)
+  function downloadExcel() {
+    if (data.entries.length === 0) {
+      alert('Belum ada data lembur yang bisa di-download.');
+      return;
+    }
+
+    // Build HTML string for Excel
+    let html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Data Lembur</x:Name>
+                <x:WorksheetOptions><x:Print><x:ValidPrinterInfo/></x:Print></x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
+          th {background-color: #f3eaff; color: #5b4791; font-weight:bold;}
+        </style>
+      </head><body><table>
+      <tr>
+        <th>Tanggal</th>
+        <th>Jam Lembur</th>
+        <th>Hari Libur</th>
+        <th>Upah Per Jam</th>
+        <th>Total Upah</th>
+      </tr>
+    `;
+
+    data.entries.forEach(entry => {
+      const rate = entry.isHoliday ? holidayOvertimePerHour : overtimePerHour;
+      const total = entry.hours * rate;
+      const dateIndo = formatDateIndo(entry.date);
+      const holidayStr = entry.isHoliday ? 'Ya' : 'Tidak';
+      html += `<tr>
+        <td>${dateIndo}</td>
+        <td>${entry.hours.toFixed(2)}</td>
+        <td>${holidayStr}</td>
+        <td>${formatRupiah(rate)}</td>
+        <td>${formatRupiah(total)}</td>
+      </tr>`;
+    });
+
+    html += '</table></body></html>';
+
+    const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Data_Lembur_${new Date().toISOString().slice(0,10)}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Navigation button events
+  btnHome.addEventListener('click', () => {
+    dashboardView = 'home';
+    updateNavActive();
+    renderDashboardContent();
+  });
+  btnInfo.addEventListener('click', () => {
+    dashboardView = 'info';
+    updateNavActive();
+    renderDashboardContent();
+  });
+
+  // On load
+  loadData();
+  // If config data is complete, start from dashboard, else first step after intro
+  if (data.config.salary && data.config.overtimePerHour && typeof data.config.holidayOvertimePerHour !== 'undefined') {
+    currentStep = 4;
+  } else {
+    currentStep = 0;
+  }
+  render();
+})();
+</script>
+</body>
+</html>
