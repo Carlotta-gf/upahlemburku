@@ -260,11 +260,10 @@
   let salary = 0;
   let overtimePerHour = 0;
   let holidayOvertimePerHour = 0;
-  // Store overtime entries as array of objects: { date: string (yyyy-mm-dd), hours: number, isHoliday: boolean }
-  // Entire app data saved and loaded from localStorage with key 'upahLemburData'
-  // Format { config: {salary, overtimePerHour, holidayOvertimePerHour}, entries: [ ... ] }
+  let totalHours = 0; // Total jam lembur
+  let totalPay = 0; // Total upah lembur
   let data = { config: {}, entries: [] };
-  let dashboardView = 'home'; // 'home' or 'info'
+  let dashboardView = 'home';
 
   const images = {
     intro: 'https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=600&q=80',
@@ -280,6 +279,7 @@
       alert('Tidak dapat menyimpan data. Pastikan browser Anda mengizinkan penyimpanan lokal.');
     }
   }
+  
   // Util: load data from localStorage
   function loadData() {
     try {
@@ -299,6 +299,7 @@
   function formatRupiah(num) {
     return num.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
   }
+  
   // Format date from yyyy-mm-dd to dd/mm/yyyy
   function formatDateIndo(dateStr) {
     const d = new Date(dateStr);
@@ -350,7 +351,7 @@
         <h2>Masukkan Jumlah Gaji Pokok Bulanan Anda</h2>
         <img src="${images.salary}" alt="Gaji" loading="lazy" />
         <label for="inputSalary">Gaji Pokok (rupiah)</label>
-        <input type="number" id="inputSalary" min="0" step="1000" placeholder="Contoh: 5.000.000" value="${salary > 0 ? salary : ''}" aria-describedby="descSalary" />
+        <input type="number" id="inputSalary" min="0" step="1000" placeholder="Contoh: 5.000.000" value="${salary > 0 ? formatRupiah(salary) : ''}" aria-describedby="descSalary" />
         <small id="descSalary" style="display:block; margin-top:0.4rem; color:#aaa; font-style: italic;">Input tanpa titik atau koma, contoh: 5000000</small>
         <button id="btnNext" ${salary <= 0 ? 'disabled' : ''} aria-disabled="${salary <= 0}">Berikutnya</button>
       </div>
@@ -386,7 +387,7 @@
       <div>
         <h2>Masukkan Jumlah Upah Lembur Per 1 Jam</h2>
         <label for="inputOvertime">Upah Lembur Per Jam (rupiah)</label>
-        <input type="number" id="inputOvertime" min="0" step="1000" placeholder="Contoh: 20.000" value="${overtimePerHour > 0 ? overtimePerHour : ''}" aria-describedby="descOvertime"/>
+        <input type="number" id="inputOvertime" min="0" step="1000" placeholder="Contoh: 20.000" value="${overtimePerHour > 0 ? formatRupiah(overtimePerHour) : ''}" aria-describedby="descOvertime"/>
         <small id="descOvertime" style="display:block; margin-top:0.4rem; color:#aaa; font-style: italic;">Input tanpa titik atau koma, contoh: 20000</small>
         <button id="btnNext" ${overtimePerHour <= 0 ? 'disabled' : ''} aria-disabled="${overtimePerHour <= 0}">Berikutnya</button>
       </div>
@@ -490,7 +491,7 @@
             <small id="dateHelp" style="color:#777; font-size:0.85rem; margin-top:-0.5rem; margin-bottom:0.8rem;">Tanggal lembur tidak boleh di masa depan</small>
             
             <label for="inputHours">Jumlah Jam Lembur</label>
-            <input type="number" id="inputHours" step="0.1" min="0.1" required aria-required="true" placeholder="Contoh: 2" />
+            <input type="number" id="inputHours" step="1" min="1" required aria-required="true" placeholder="Contoh: 2" />
             
             <label for="selectHoliday">Hari Libur?</label>
             <select id="selectHoliday" aria-required="true" required>
@@ -622,17 +623,21 @@
       return;
     }
     tbody.innerHTML = '';
+    totalHours = 0; // Reset total hours
+    totalPay = 0; // Reset total pay
     data.entries.forEach((entry, index) => {
       const rate = entry.isHoliday ? holidayOvertimePerHour : overtimePerHour;
       const total = entry.hours * rate;
+      totalHours += entry.hours; // Accumulate total hours
+      totalPay += total; // Accumulate total pay
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${formatDateIndo(entry.date)}</td>
-        <td>${entry.hours.toFixed(2)}</td>
+        <td>${entry.hours}</td> <!-- Hanya satu angka -->
         <td>${entry.isHoliday ? 'Ya' : 'Tidak'}</td>
         <td>${formatRupiah(rate)}</td>
         <td>${formatRupiah(total)}</td>
-        <td><button class="btnDelete" aria-label="Hapus data lembur tanggal ${formatDateIndo(entry.date)}" title="Hapus"><svg class="icon" viewBox="0 0 448 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M135.2 17.7L121 32H24c-13.3 0-24 10.7-24 24v16c0 6.6 5.4 12 12 12H32l35.2 352.1c1.2 15.3 14.3 27.2 29.7 27.2h293.7c15.4 0 28.5-11.9 29.7-27.2L416 84H432c6.6 0 12-5.4 12-12V56c0-13.3-10.7-24-24-24H327l-14.2-14.3C306.3 3.7 294.6 0 282.6 0H172c-12 0-23.7 3.7-36.8 17.7zM312 144c0-8.8-7.2-16-16-16s-16 7.2-16 16v256c0 8.8 7.2 16 16 16s16-7.2 16-16V144zm-96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v256c0 8.8 7.2 16 16 16s16-7.2 16-16V144zm96 272c0 8.8-7.2 16-16 16s-16-7.2-16-16v-16h32v16z"/></svg></button></td>
+        <td><button class="btnDelete" aria-label="Hapus data lembur tanggal ${formatDateIndo(entry.date)}" title="Hapus">Hapus</button></td>
       `;
       row.querySelector('.btnDelete').addEventListener('click', () => {
         if (confirm(`Hapus data lembur tanggal ${formatDateIndo(entry.date)}?`)) {
@@ -644,6 +649,15 @@
       });
       tbody.appendChild(row);
     });
+
+    // Menambahkan baris untuk total jam lembur dan total upah
+    const totalRow = document.createElement('tr');
+    totalRow.innerHTML = `
+      <td colspan="4" style="text-align: right;"><strong>Total</strong></td>
+      <td>${formatRupiah(totalPay)}</td>
+      <td></td>
+    `;
+    tbody.appendChild(totalRow);
   }
 
   // Bind the add overtime form submission
@@ -674,7 +688,7 @@
 
       // Validate hours
       const hoursValRaw = inputHours.value;
-      const hoursVal = parseFloat(hoursValRaw.replace(',', '.'));
+      const hoursVal = parseInt(hoursValRaw);
       if (isNaN(hoursVal) || hoursVal <= 0) {
         alert('Masukkan jumlah jam lembur yang valid.');
         inputHours.focus();
@@ -714,18 +728,6 @@
             xmlns:x="urn:schemas-microsoft-com:office:excel"
             xmlns="http://www.w3.org/TR/REC-html40">
       <head>
-        <!--[if gte mso 9]>
-        <xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>Data Lembur</x:Name>
-                <x:WorksheetOptions><x:Print><x:ValidPrinterInfo/></x:Print></x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml>
-        <![endif]-->
         <style>
           table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
           th {background-color: #f3eaff; color: #5b4791; font-weight:bold;}
@@ -747,12 +749,20 @@
       const holidayStr = entry.isHoliday ? 'Ya' : 'Tidak';
       html += `<tr>
         <td>${dateIndo}</td>
-        <td>${entry.hours.toFixed(2)}</td>
+        <td>${entry.hours}</td>
         <td>${holidayStr}</td>
         <td>${formatRupiah(rate)}</td>
         <td>${formatRupiah(total)}</td>
       </tr>`;
     });
+
+    // Menambahkan total jam lembur dan total upah di bagian bawah
+    html += `
+      <tr>
+        <td colspan="4" style="text-align: right;"><strong>Total</strong></td>
+        <td>${formatRupiah(totalPay)}</td>
+      </tr>
+    `;
 
     html += '</table></body></html>';
 
@@ -779,8 +789,34 @@
     renderDashboardContent();
   });
 
+  // Check if it's the start of a new month
+  function checkNewMonth() {
+    const lastSavedDate = localStorage.getItem('lastSavedDate');
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    if (lastSavedDate) {
+      const lastDate = new Date(lastSavedDate);
+      const lastMonth = lastDate.getMonth();
+      const lastYear = lastDate.getFullYear();
+
+      // Reset data if the month has changed
+      if (currentMonth !== lastMonth || currentYear !== lastYear) {
+        if (confirm('Bulan baru telah dimulai. Data lembur akan di-reset. Apakah Anda ingin melanjutkan?')) {
+          data.entries = [];
+          saveData();
+        }
+      }
+    }
+
+    // Update last saved date
+    localStorage.setItem('lastSavedDate', today.toISOString());
+  }
+
   // On load
   loadData();
+  checkNewMonth();
   // If config data is complete, start from dashboard, else first step after intro
   if (data.config.salary && data.config.overtimePerHour && typeof data.config.holidayOvertimePerHour !== 'undefined') {
     currentStep = 4;
