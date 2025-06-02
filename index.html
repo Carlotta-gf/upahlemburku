@@ -526,11 +526,9 @@
           </div>
           <div id="tableDesc" style="display:none;">Data lembur ditampilkan pada tabel di atas</div>
         </section>
-        <button id="btnEdit" style="margin-top: 2rem;">Edit Gaji dan Upah</button>
       `;
       bindAddOvertimeForm();
       renderOvertimeTable();
-      bindEditButton();
     } else if (dashboardView === 'info') {
       renderInfoPage();
     }
@@ -578,7 +576,6 @@
               <th>Total Data</th>
               <th>Total Jam</th>
               <th>Total Upah</th>
-              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -594,9 +591,8 @@
           <tr>
             <td>${monthYearStr}</td>
             <td>${stats.entries}</td>
-            <td>${Math.floor(stats.hours)}</td>
+            <td>${stats.hours.toFixed(2)}</td>
             <td>${formatRupiah(stats.pay)}</td>
-            <td><button class="btnDownloadMonthly" data-month="${m}">Download Data ${monthYearStr}.xls</button></td>
           </tr>
         `;
       }
@@ -610,74 +606,12 @@
     contentEl.innerHTML = `
       <h3>Informasi Lembur</h3>
       <p>Total Data Lembur: <strong>${data.entries.length}</strong></p>
-      <p>Total Jam Lembur: <strong>${Math.floor(totalHours)}</strong> jam</p>
+      <p>Total Jam Lembur: <strong>${totalHours.toFixed(2)}</strong> jam</p>
       <p>Total Upah Lembur: <strong>${formatRupiah(totalPay)}</strong></p>
+      <button id="btnDownloadExcel" class="download-btn" aria-label="Download Data Lembur Excel">Download Data Excel (.xls)</button>
       ${monthlyTableHtml}
     `;
-
-    // Add event listeners for monthly download buttons
-    document.querySelectorAll('.btnDownloadMonthly').forEach(button => {
-      button.addEventListener('click', () => {
-        const monthKey = button.getAttribute('data-month');
-        downloadMonthlyExcel(monthKey);
-      });
-    });
-  }
-
-  // Download monthly data in Excel-compatible XLS (HTML table format)
-  function downloadMonthlyExcel(monthKey) {
-    const filteredEntries = data.entries.filter(entry => entry.date.startsWith(monthKey));
-    if (filteredEntries.length === 0) {
-      alert('Belum ada data lembur untuk bulan ini.');
-      return;
-    }
-
-    // Build HTML string for Excel
-    let html = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office"
-            xmlns:x="urn:schemas-microsoft-com:office:excel"
-            xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <style>
-          table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
-          th {background-color: #f3eaff; color: #5b4791; font-weight:bold;}
-          td {background-color: #ffff99;} /* Warna kuning untuk data */
-        </style>
-      </head><body><table>
-      <tr>
-        <th>Tanggal</th>
-        <th>Jam Lembur</th>
-        <th>Hari Libur</th>
-        <th>Upah Per Jam</th>
-        <th>Total Upah</th>
-      </tr>
-    `;
-
-    filteredEntries.forEach(entry => {
-      const rate = entry.isHoliday ? holidayOvertimePerHour : overtimePerHour;
-      const total = entry.hours * rate;
-      const dateIndo = formatDateIndo(entry.date);
-      const holidayStr = entry.isHoliday ? 'Ya' : 'Tidak';
-      html += `<tr>
-        <td>${dateIndo}</td>
-        <td>${entry.hours}</td>
-        <td>${holidayStr}</td>
-        <td>${formatRupiah(rate)}</td>
-        <td>${formatRupiah(total)}</td>
-      </tr>`;
-    });
-
-    html += '</table></body></html>';
-
-    const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Data_Lembur_${monthKey}.xls`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    document.getElementById('btnDownloadExcel').addEventListener('click', downloadExcel);
   }
 
   // Render the overtime entries table body
@@ -781,42 +715,79 @@
     });
   }
 
-  // Bind the edit button
-  function bindEditButton() {
-    const btnEdit = document.getElementById('btnEdit');
-    btnEdit.addEventListener('click', () => {
-      appEl.innerHTML = `
-        <div>
-          <h2>Edit Gaji dan Upah</h2>
-          <label for="editSalary">Gaji Pokok (rupiah)</label>
-          <input type="number" id="editSalary" min="0" step="1000" value="${salary}" />
-          
-          <label for="editOvertime">Upah Lembur Per Jam (rupiah)</label>
-          <input type="number" id="editOvertime" min="0" step="1000" value="${overtimePerHour}" />
-          
-          <label for="editHolidayOvertime">Upah Lembur Hari Libur Per Jam (rupiah)</label>
-          <input type="number" id="editHolidayOvertime" min="0" step="1000" value="${holidayOvertimePerHour}" />
-          
-          <button id="btnSaveEdit" style="margin-top: 2rem;">Simpan Perubahan</button>
-        </div>
-      `;
+  // Download data in Excel-compatible XLS (HTML table format)
+  function downloadExcel() {
+    if (data.entries.length === 0) {
+      alert('Belum ada data lembur yang bisa di-download.');
+      return;
+    }
 
-      const btnSaveEdit = document.getElementById('btnSaveEdit');
-      btnSaveEdit.addEventListener('click', () => {
-        salary = parseInt(document.getElementById('editSalary').value);
-        overtimePerHour = parseInt(document.getElementById('editOvertime').value);
-        holidayOvertimePerHour = parseInt(document.getElementById('editHolidayOvertime').value);
+    // Build HTML string for Excel
+    let html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <style>
+          table, th, td {border: 1px solid black; border-collapse: collapse; padding: 5px;}
+          th {background-color: #f3eaff; color: #5b4791; font-weight:bold;}
+        </style>
+      </head><body><table>
+      <tr>
+        <th>Tanggal</th>
+        <th>Jam Lembur</th>
+        <th>Hari Libur</th>
+        <th>Upah Per Jam</th>
+        <th>Total Upah</th>
+      </tr>
+    `;
 
-        // Update data config
-        data.config.salary = salary;
-        data.config.overtimePerHour = overtimePerHour;
-        data.config.holidayOvertimePerHour = holidayOvertimePerHour;
-
-        saveData();
-        renderDashboardContent(); // Kembali ke dashboard
-      });
+    data.entries.forEach(entry => {
+      const rate = entry.isHoliday ? holidayOvertimePerHour : overtimePerHour;
+      const total = entry.hours * rate;
+      const dateIndo = formatDateIndo(entry.date);
+      const holidayStr = entry.isHoliday ? 'Ya' : 'Tidak';
+      html += `<tr>
+        <td>${dateIndo}</td>
+        <td>${entry.hours}</td>
+        <td>${holidayStr}</td>
+        <td>${formatRupiah(rate)}</td>
+        <td>${formatRupiah(total)}</td>
+      </tr>`;
     });
+
+    // Menambahkan total jam lembur dan total upah di bagian bawah
+    html += `
+      <tr>
+        <td colspan="4" style="text-align: right;"><strong>Total</strong></td>
+        <td>${formatRupiah(totalPay)}</td>
+      </tr>
+    `;
+
+    html += '</table></body></html>';
+
+    const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Data_Lembur_${new Date().toISOString().slice(0,10)}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
+
+  // Navigation button events
+  btnHome.addEventListener('click', () => {
+    dashboardView = 'home';
+    updateNavActive();
+    renderDashboardContent();
+  });
+  btnInfo.addEventListener('click', () => {
+    dashboardView = 'info';
+    updateNavActive();
+    renderDashboardContent();
+  });
 
   // Check if it's the start of a new month
   function checkNewMonth() {
